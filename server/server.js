@@ -16,7 +16,7 @@ const port = process.env.PORT || 8000;
 
 // Database connection
 mongoose.connect(
-	process.env.MONGO_URL || "mongodb://127.0.0.1:27017/full-stack-app"
+	process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/full-stack-app"
 );
 
 // Middleware
