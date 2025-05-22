@@ -9,7 +9,12 @@ router.get("/getAll", ads.getAll);
 router.get("/getById/:id", ads.getById);
 router.get("/getBySearchPhrase/:searchPhrase", ads.getBySearchPhrase);
 router.post("/create", authMiddleware, imageUpload.single("image"), ads.create);
-router.put("/update/:id", authMiddleware, ads.update);
+router.put(
+	"/update/:id",
+	authMiddleware,
+	imageUpload.single("image"),
+	ads.update
+);
 router.delete("/delete/:id", authMiddleware, ads.delete);
 
 module.exports = router;

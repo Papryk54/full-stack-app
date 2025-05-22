@@ -12,6 +12,7 @@ const adsSchema = new mongoose.Schema({
 		ref: "user",
 		required: true,
 	},
+	sellerName: { type: String, required: true },
 });
 
 module.exports = mongoose.model("ads", adsSchema);

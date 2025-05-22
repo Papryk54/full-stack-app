@@ -1,5 +1,6 @@
 const Ads = require("../models/ads.model");
 const Session = require("../models/session.model");
+const getImageFileType = require("../utils/getImageFileType");
 
 exports.getAll = async (req, res) => {
 	try {
@@ -27,7 +28,11 @@ exports.getBySearchPhrase = async (req, res) => {
 		const ads = await Ads.find();
 		let SearchResult = [];
 		ads.map((ad) => {
-			if (ad.title.includes(`${req.params.searchPhrase}`)) {
+			if (
+				ad.title
+					.toUpperCase()
+					.includes(`${req.params.searchPhrase.toUpperCase()}`)
+			) {
 				SearchResult.push(ad);
 			}
 		});
@@ -39,9 +44,16 @@ exports.getBySearchPhrase = async (req, res) => {
 
 exports.create = async (req, res) => {
 	try {
-		const { title, description, publishDate, price, location, sellerInfo } =
-			req.body;
-		const image = req.file ? req.file.filename : null;
+		const {
+			title,
+			description,
+			publishDate,
+			price,
+			location,
+			sellerInfo,
+			sellerName,
+		} = req.body;
+		const fileType = req.file ? await getImageFileType(req.file) : "unknown";
 		const priceNumber = Number(price);
 		if (
 			title &&
@@ -51,26 +63,31 @@ exports.create = async (req, res) => {
 			description &&
 			typeof description === "string" &&
 			description.length >= 20 &&
-			description.length <= 1000 &&
+			description.length <= 2000 &&
 			publishDate &&
 			!isNaN(Date.parse(publishDate)) &&
-			image &&
-			typeof image === "string" &&
+			req.file &&
+			["image/png", "image/jpeg", "image/gif", "image/jpg"].includes(
+				fileType
+			) &&
 			!isNaN(priceNumber) &&
 			priceNumber > 0 &&
 			location &&
 			typeof location === "string" &&
 			sellerInfo &&
-			typeof sellerInfo === "string"
+			typeof sellerInfo === "string" &&
+			sellerName &&
+			typeof sellerName === "string"
 		) {
 			const ads = new Ads({
 				title,
 				description,
 				publishDate: new Date(publishDate),
-				image,
+				image: req.file.filename,
 				price: priceNumber,
 				location,
 				sellerInfo,
+				sellerName,
 			});
 			await ads.save();
 			res.status(201).json({ message: "new Ad created" });
@@ -91,23 +108,45 @@ exports.update = async (req, res) => {
 			login: sessionData.user.login,
 		};
 
-		const ads = await Ads.findById(req.params.id);
-		if (!ads) {
-			return res.status(404).json({ message: "Document not Found" });
-		}
+		const ad = await Ads.findById(req.params.id);
+		if (!ad) return res.status(404).json({ message: "Document not Found" });
+		if (ad.sellerInfo.toString() !== req.session.user.id)
+			return res.status(403).json({ message: "Unauthorized" });
 
-		if (ads.sellerInfo.toString() === req.session.user.id) {
-			const updatedAds = await Ads.findByIdAndUpdate(req.params.id, req.body, {
-				new: true,
-			});
-			res.json(updatedAds);
+		const { title, description, publishDate, price, location, sellerInfo } =
+			req.body;
+
+		const priceNumber = Number(price);
+		const image = req.file ? req.file.filename : ad.image;
+
+		if (
+			title &&
+			description &&
+			!isNaN(priceNumber) &&
+			priceNumber > 0 &&
+			location &&
+			sellerInfo
+		) {
+			const updatedAd = await Ads.findByIdAndUpdate(
+				req.params.id,
+				{
+					title,
+					description,
+					publishDate: publishDate ? new Date(publishDate) : ad.publishDate,
+					price: priceNumber,
+					location,
+					sellerInfo,
+					sellerName,
+					image,
+				},
+				{ new: true }
+			);
+			return res.json(updatedAd);
 		} else {
-			return res
-				.status(403)
-				.json({ message: "You are not authorized to edit this ad." });
+			return res.status(400).json({ message: "Invalid input data" });
 		}
 	} catch (err) {
-		res.status(500).json({ message: err });
+		return res.status(500).json({ message: err.message });
 	}
 };
 

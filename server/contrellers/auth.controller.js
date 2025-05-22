@@ -1,10 +1,11 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcryptjs");
 const getImageFileType = require("../utils/getImageFileType");
+const Session = require("../models/session.model");
 
 exports.register = async (req, res) => {
 	try {
-		const { login, password, avatar, phoneNumber } = req.body;
+		const { login, password, phoneNumber } = req.body;
 		const fileType = req.file ? await getImageFileType(req.file) : "unknown";
 
 		if (
@@ -15,7 +16,7 @@ exports.register = async (req, res) => {
 			phoneNumber &&
 			typeof phoneNumber === "string" &&
 			req.file &&
-			["image/png", "image/jpeg", "image/gif"].includes(fileType)
+			["image/png", "image/jpeg", "image/gif", "image/jpg"].includes(fileType)
 		) {
 			const userWithLogin = await User.findOne({ login });
 			if (userWithLogin) {
@@ -56,7 +57,7 @@ exports.login = async (req, res) => {
 						id: user._id,
 						login: user.login,
 					};
-					res.status(200).send({ message: "Login successful" });
+					res.status(200).send({ _id: user._id, login: user.login });
 				} else {
 					res.status(400).send("Login or password are incorrect");
 				}
@@ -64,6 +65,25 @@ exports.login = async (req, res) => {
 		} else {
 			res.status(400).send("Enter login and password");
 		}
+	} catch (err) {
+		res.status(500).send({ message: err.message });
+	}
+};
+
+exports.logOut = async (req, res) => {
+	try {
+		req.session.destroy(async (err) => {
+			if (err) {
+				return res.status(500).send({ message: "Logout failed" });
+			}
+			res.clearCookie("connect.sid");
+
+			if (process.env.NODE_ENV !== "production") {
+				await Session.deleteMany({});
+			}
+
+			return res.status(200).send({ message: "Logged out successfully" });
+		});
 	} catch (err) {
 		res.status(500).send({ message: err.message });
 	}

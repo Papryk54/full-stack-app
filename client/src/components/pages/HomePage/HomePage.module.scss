@@ -1,0 +1,121 @@
+@import "../../../styles/variables.scss";
+
+.homepage {
+	max-width: 1280px;
+	width: 100%;
+	margin: 0 auto;
+
+	.adsManagement {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: calc(800px + 80px + 150px);
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.addOffer {
+		margin: 100px 20px 0;
+		padding: 0 20px;
+		height: 70px;
+	}
+
+	.searchBar {
+		width: calc(800px + 80px);
+		margin: 100px auto 0 auto;
+		display: flex;
+		border: solid 2px $primary-color;
+		box-shadow: 20px 38px 34px -26px hsla(0, 0%, 0%, 1);
+		border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+
+		input {
+			width: 800px;
+			padding: 5px;
+			line-height: 35px;
+			height: 70px;
+			border: none;
+			border-right: solid 2px $primary-color;
+			background-color: transparent;
+		}
+
+		button {
+			width: 80px;
+			border: none;
+			color: $link-color;
+			background-color: transparent;
+			&:hover {
+				color: $link-color-hover;
+			}
+		}
+	}
+
+	main {
+		margin-top: 50px;
+		h2 {
+			letter-spacing: 1px;
+			margin-bottom: 20px;
+			font-size: 60px;
+			text-align: center;
+		}
+
+		.adsGrid {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 50px;
+
+			.adCard {
+				display: flex;
+				align-items: center;
+				height: 220px;
+				width: 400px;
+				padding: 15px;
+				border: 6px solid $primary-color;
+				box-shadow: 20px 38px 34px -26px hsla(0, 0%, 0%, 0.2);
+				border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+
+				&:hover {
+					box-shadow: 15px 20px 20px -15px hsla(0, 0%, 0%, 1);
+				}
+
+				.imageArea {
+					height: 150px;
+					width: 150px;
+					border-radius: 8px;
+					position: relative;
+
+					.magnetImg {
+						position: absolute;
+						z-index: 1;
+						right: calc(150px / 2 - 35px / 2);
+						top: 5%;
+						width: 35px;
+						height: 35px;
+					}
+
+					img {
+						height: 100%;
+						width: 100%;
+						border-radius: 8px;
+					}
+				}
+			}
+
+			.adText {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				width: 220px;
+
+				h3,
+				p,
+				a {
+					margin-left: 20px;
+					padding: 5% 0;
+					text-align: left;
+					border-bottom: 2px solid $primary-color;
+					border-radius: 255px 15px 225px 0px/15px 225px 25px 255px;
+				}
+			}
+		}
+	}
+}

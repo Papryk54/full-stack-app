@@ -1,26 +1,37 @@
 // Core imports
+require("dotenv").config();
+
 const express = require("express");
 const session = require("express-session");
 const mongoose = require("mongoose");
+const cors = require("cors");
+const path = require("path");
 
 // Session store
 const MongoStore = require("connect-mongo");
 
 // Express app initialization
 const app = express();
-const port = 8000;
+const port = process.env.PORT || 8000;
 
 // Database connection
-mongoose.connect("mongodb://127.0.0.1:27017/full-stack-app");
+mongoose.connect(
+	process.env.MONGO_URL || "mongodb://127.0.0.1:27017/full-stack-app"
+);
 
-// Middleware: request body parsers
+// Middleware
+app.use(
+	cors({
+		origin: process.env.CLIENT_URL || "http://localhost:5173",
+		credentials: true,
+	})
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Middleware: session configuration
+app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 app.use(
 	session({
-		secret: "xyz567",
+		secret: process.env.SESSION_SECRET || "xyz567",
 		resave: false,
 		saveUninitialized: false,
 		store: MongoStore.create({ client: mongoose.connection.getClient() }),
@@ -42,5 +53,5 @@ app.get("/", (req, res) => {
 
 // Server start
 app.listen(port, () => {
-	console.log(`Example app listening on port ${port}`);
+	console.log(`App listening on port ${port}`);
 });
