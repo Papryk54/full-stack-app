@@ -1,5 +1,4 @@
 // Core imports
-
 const express = require("express");
 const session = require("express-session");
 const mongoose = require("mongoose");
@@ -49,6 +48,14 @@ app.use("/users", require("./routes/users.routes"));
 app.get("/", (req, res) => {
 	res.send("Hello World!");
 });
+
+if (process.env.NODE_ENV === "production") {
+	const clientPath = path.join(__dirname, "../client/dist");
+	app.use(express.static(clientPath));
+	app.get("*", (req, res) => {
+		res.sendFile(path.join(clientPath, "index.html"));
+	});
+}
 
 // Server start
 app.listen(port, () => {
