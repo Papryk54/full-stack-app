@@ -3,12 +3,8 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 const Header = () => {
-	const user = useSelector((state) => state.user);
-	if (user === null) {
-		user = {
-			login: null,
-		};
-	}
+	const userFromStore = useSelector((state) => state.user);
+	const user = userFromStore ?? { login: null };
 	return (
 		<header className={styles.header}>
 			<div className={styles.logo}>
