@@ -18,9 +18,11 @@ mongoose.connect(
 );
 
 // Middleware
+const allowedOrigin = process.env.CLIENT_URL || "http://localhost:5173";
+
 app.use(
 	cors({
-		origin: process.env.CLIENT_URL || "http://localhost:5173",
+		origin: allowedOrigin,
 		credentials: true,
 	})
 );
@@ -43,11 +45,6 @@ app.use(
 app.use("/ads", require("./routes/ads.routes"));
 app.use("/auth", require("./routes/auth.routes"));
 app.use("/users", require("./routes/users.routes"));
-
-// Base route
-app.get("/", (req, res) => {
-	res.send("Hello World!");
-});
 
 if (process.env.NODE_ENV === "production") {
 	const clientPath = path.join(__dirname, "../client/dist");

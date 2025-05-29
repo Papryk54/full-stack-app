@@ -113,8 +113,15 @@ exports.update = async (req, res) => {
 		if (ad.sellerInfo.toString() !== req.session.user.id)
 			return res.status(403).json({ message: "Unauthorized" });
 
-		const { title, description, publishDate, price, location, sellerInfo, sellerName } =
-			req.body;
+		const {
+			title,
+			description,
+			publishDate,
+			price,
+			location,
+			sellerInfo,
+			sellerName,
+		} = req.body;
 
 		const priceNumber = Number(price);
 		const image = req.file ? req.file.filename : ad.image;
